@@ -26,25 +26,15 @@ shinyServer(
       input$goButton
       isolate(EMI(input$Principal,input$Interest,input$Tenure))
     })
-    
+   
     output$EMIBreakUp <- renderTable({
-      if(input$goButton != 0) {
         input$goButton
         EMICalc = as.numeric(EMI(input$Principal,input$Interest,input$Tenure))
         isolate(EMIBreakUp(input$Principal,input$Interest,input$Tenure,EMICalc))
-      }
     },
     include.rownames=FALSE
     )
     
-    output$EMIPlot <- renderPlot({
-      if(input$goButton != 0) {
-        input$goButton
-        EMICalc = as.numeric(EMI(input$Principal,input$Interest,input$Tenure))
-        EMIBreakUpCalc = EMIBreakUp(input$Principal,input$Interest,input$Tenure,EMICalc)
-        isolate(EMIPlot(EMIBreakUpCalc))
-      }
-    })
   }
   )
 
@@ -78,12 +68,4 @@ EMIBreakUp <- function(Principal,Interest,Tenure,EMI){
   EMIBreakUp = data.frame(Month,Principal.Paid,Interest.Paid,Outstanding)
   colnames(EMIBreakUp) = c("Month","Principal","Interest","Outstanding")
   EMIBreakUp = xtable(EMIBreakUp)
-}
-
-EMIPlot <- function(EMIBreakUpCalc){
-  EMIBreakUpCalc$Year = EMIBreakUpCalc%/%12
-  EMIBreakUpCalc <- tbl_df(EMIBreakUpCalc)
-  EMIBreakUpGroup <- group_by(EMIBreakUpCalc,Year) %>%
-                     summarize(sum(Principal),sum(Interest),sum(Outstanding))
-  EMIPlot = barplot(EMIBreakUpGroup$Year,EMIBreakUpGroup$Principal)
 }
